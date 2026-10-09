@@ -25,7 +25,7 @@ const users = [
       <v-row>
         <v-col cols="12" xl="4">
           <div class="section-aside why-choose__intro">
-            <SharedSectionLabel number="04" title="About us" />
+            <SharedSectionLabel number="05" title="About us" />
             <div v-reveal class="mt-8 mt-xl-10">
               <SharedSectionHeading
                 title="Why choose us"

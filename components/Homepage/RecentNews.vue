@@ -7,7 +7,7 @@ import { Icon } from "@iconify/vue";
     <SharedSectionSpacer />
     <div class="container-lg">
       <SharedSectionIntro
-        number="08"
+        number="10"
         label="Resources"
         title="Recent news"
         subtitle="Explore the latest trends, bold projects, and creative insights from our agency—shaping the future of branding, digital experiences, and storytelling."

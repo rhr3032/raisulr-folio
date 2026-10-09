@@ -8,8 +8,10 @@ useHead({ title: "Raisul R. | Portfolio" });
     <HomepageStatsAndFacts />
     <HomepagePortfolio />
     <HomepageWhatweDo />
+    <HomepageProcess />
     <HomepageWhyChoose />
-    <HomepageStoriesFromClient />
+    <HomepageToolkit />
+    <HomepageStoriesFromClient class="section-divide" />
     <HomepagePricing />
     <HomepageFAQ />
     <HomepageRecentNews />

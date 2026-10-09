@@ -56,7 +56,7 @@ const formatPrice = (value: number) => value.toLocaleString("en-US");
     <SharedSectionSpacer />
     <div class="container-lg">
       <SharedSectionIntro
-        number="06"
+        number="08"
         label="Pricing"
         title="Affordable pricing"
         subtitle="A glimpse into our creativity—exploring innovative designs, successful collaborations, and transformative digital experiences."

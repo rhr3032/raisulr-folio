@@ -38,7 +38,7 @@ const open = ref<number | undefined>(0);
     <SharedSectionSpacer />
     <div class="container-lg">
       <SharedSectionIntro
-        number="07"
+        number="09"
         label="FAQs"
         title="Frequently asked questions"
         subtitle="Discover how we tailor our solutions to meet unique needs, delivering impactful strategies, personalized branding, and exceptional customer experiences."

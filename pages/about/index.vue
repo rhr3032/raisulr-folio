@@ -7,5 +7,9 @@ useHead({ title: "About" });
     <AboutPageBanner />
     <AboutPageCounterCards />
     <AboutPageFeatureBanner />
+    <AboutPageJourney />
+    <AboutPageExpertise />
+    <AboutPagePrinciples />
+    <HomepageGetinTouch number="05" />
   </div>
 </template>

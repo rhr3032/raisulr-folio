@@ -35,7 +35,7 @@ const testimonials = [
     <SharedSectionSpacer />
     <div class="container-lg">
       <SharedSectionIntro
-        number="05"
+        number="07"
         label="Testimonial"
         title="Stories from clients"
         subtitle="Real experiences, genuine feedback—discover how our creative solutions have transformed brands and elevated businesses."
