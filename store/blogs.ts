@@ -27,8 +27,7 @@ export const useblogGridStore = defineStore('blogs',{
                 const data = await axios.get('/api/data/blog/grid');
                 this.blogGrid = data.data;
             } catch (error) {
-                alert(error);
-                console.log(error);
+                console.error(error);
             }
         },
         async fetchPost(title: string) {
@@ -36,8 +35,7 @@ export const useblogGridStore = defineStore('blogs',{
                 const response = await axios.post('/api/data/blog/post', { title });
                 this.selectedblog = response.data.post;
             } catch (error) {
-                alert(error);
-                console.log(error);
+                console.error(error);
             }
         }
     }

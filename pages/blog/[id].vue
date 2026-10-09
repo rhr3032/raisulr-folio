@@ -1,3 +1,5 @@
 <template>
-    <BlogsBlogDetails/>
+  <div>
+    <BlogsBlogDetails />
+  </div>
 </template>

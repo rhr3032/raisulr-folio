@@ -1,106 +1,69 @@
 <script setup lang="ts">
 import { onMounted, computed } from "vue";
 import { useProjectsGridStore } from "@/store/project";
-import { Icon } from "@iconify/vue";
-import { Carousel, Slide } from "vue3-carousel";
-import { Pagination as CarouselPagination } from "vue3-carousel";
-import type { CarouselSettings } from "vue3-carousel";
 
-const sliderSettings: CarouselSettings = {
-  snapAlign: "start",
-  itemsToShow: 4,
-  wrapAround: true,
-  breakpoints: {
-    1800: {
-      itemsToShow: 4,
-      snapAlign: "start",
-    },
-    1600: {
-      itemsToShow: 3,
-      snapAlign: "start",
-    },
-    1368: {
-      itemsToShow: 3,
-      snapAlign: "start",
-    },
-    1024: {
-      itemsToShow: 2,
-      snapAlign: "center",
-    },
-
-    768: {
-      itemsToShow: 2,
-      snapAlign: "center",
-    },
-    300: {
-      itemsToShow: 1,
-      snapAlign: "center",
-    },
-  },
-};
+// Homepage "Featured projects" – an editorial, alternating grid of the first
+// four projects. The full list lives on /projects.
+const FEATURED_COUNT = 4;
 
 const store = useProjectsGridStore();
 
 onMounted(() => {
-  store.fetchPosts();
+  if (!store.projectGrid.length) store.fetchPosts();
 });
 
-const getPosts = computed(() => store.projectGrid);
-
-const slugify = (title?: string) => {
-  if (!title) return "";
-  return title
-    .toLowerCase()
-    .replace(/ /g, "-")
-    .replace(/[^\w-]+/g, "");
-};
+const featured = computed(() => store.projectGrid.slice(0, FEATURED_COUNT));
 </script>
 
 <template>
-  <div>
-    <carousel
-      class="overflow-hidden"
-      :snapAlign="sliderSettings.snapAlign"
-      :itemsToShow="sliderSettings.itemsToShow"
-      :wrapAround="sliderSettings.wrapAround"
-      :breakpoints="sliderSettings.breakpoints"
-    >
-      <slide v-for="projects in getPosts" :key="projects.id">
-        <div>
-          <NuxtLink
-            :to="`/projects/${slugify(projects.project_title)}`"
-            class="project-card"
-          >
-            <div class="image-wrapper lh-0">
-              <img
-                :src="projects.project_image"
-                alt="image"
-                class="project-image w-100"
-                cover
-              />
-              <div class="image-overlay">
-                <v-avatar size="60" class="icon bg-primary">
-                  <Icon icon="material-symbols:arrow-outward" height="25" />
-                </v-avatar>
-              </div>
-            </div>
-          </NuxtLink>
-          <h3 class="text-h3 text-dark py-5">
-            {{ projects.project_title }}
-          </h3>
-          <div class="d-flex ga-3">
-            <v-chip variant="outlined" class="text-subtitle-2 text-dark">{{
-              projects.tag1
-            }}</v-chip>
-            <v-chip variant="outlined" class="text-subtitle-2 text-dark">{{
-              projects.tag2
-            }}</v-chip>
-          </div>
-        </div>
-      </slide>
-      <template #addons>
-        <CarouselPagination />
-      </template>
-    </carousel>
+  <div class="featured-grid">
+    <ProjectsProjectCard
+      v-for="(project, index) in featured"
+      :key="project.id"
+      v-reveal="(index % 2) * 120"
+      :project="project"
+      :index="index"
+      class="featured-grid__item"
+      :class="`featured-grid__item--${index % 4}`"
+    />
   </div>
 </template>
+
+<style scoped>
+.featured-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(2.5rem, 2rem + 2vw, 4rem) 24px;
+}
+
+@media (min-width: 768px) {
+  .featured-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: clamp(20px, 2vw, 32px);
+  }
+
+  .featured-grid__item {
+    --card-ratio: auto;
+    --card-height: clamp(280px, 34vw, 600px);
+  }
+
+  .featured-grid__item--0,
+  .featured-grid__item--3 {
+    grid-column: span 7;
+  }
+
+  .featured-grid__item--1,
+  .featured-grid__item--2 {
+    grid-column: span 5;
+  }
+
+  /* Gentle stagger so the grid reads as an editorial layout */
+  .featured-grid__item--1 {
+    margin-top: clamp(40px, 6vw, 120px);
+  }
+
+  .featured-grid__item--3 {
+    margin-top: clamp(40px, 6vw, 120px);
+  }
+}
+</style>

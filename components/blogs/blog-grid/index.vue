@@ -1,56 +1,79 @@
 <script setup lang="ts">
 import { onMounted, computed } from "vue";
 import { useblogGridStore } from "@/store/blogs";
-import { Icon } from "@iconify/vue";
 
 const store = useblogGridStore();
 
 onMounted(() => {
-  store.fetchPosts();
+  if (!store.blogGrid.length) store.fetchPosts();
 });
 
 const getPosts = computed(() => store.blogGrid);
-
-// Slug function to create URL-friendly links
-const slugify = (title?: string) => {
-  if (!title) return "";
-  return title
-    .toLowerCase()
-    .replace(/ /g, "-")
-    .replace(/[^\w-]+/g, "");
-};
 </script>
 
 <template>
-  <div class="bg-darkgray">
+  <section class="bg-darkgray">
     <SharedSectionSpacer />
     <div class="container-lg">
-      <v-row>
-        <v-col cols="12" md="6" v-for="blog in getPosts" :key="blog.id">
-          <NuxtLink
-            :to="`/blog/${slugify(blog.blog_title)}`"
-            class="project-card"
-          >
-            <div class="blog-image-wrapper">
-              <v-img
-                class="blog-image"
-                :src="blog.blog_image"
-                height="600"
-                cover
-              ></v-img>
-            </div>
-          </NuxtLink>
-          <v-card-text class="px-0 pt-4">
-            <div class="text-subtitle-2 text-dark opacity-70">
-              {{ blog.blog_date }}
-            </div>
-            <h4 class="text-h4 text-dark">
-              {{ blog.blog_title }}
-            </h4>
-          </v-card-text>
-        </v-col>
-      </v-row>
+      <div class="blog-head">
+        <SharedSectionLabel number="01" title="Latest articles" />
+        <p v-if="getPosts.length" class="blog-head__count">{{ String(getPosts.length).padStart(2, "0") }} articles</p>
+      </div>
+
+      <div class="blog-grid">
+        <BlogsBlogCard
+          v-for="(blog, index) in getPosts"
+          :key="blog.id"
+          v-reveal="index === 0 ? 0 : ((index - 1) % 3) * 90"
+          :blog="blog"
+          :featured="index === 0"
+          heading-level="h2"
+          :class="{ 'blog-grid__featured': index === 0 }"
+        />
+      </div>
     </div>
     <SharedSectionSpacer />
-  </div>
+  </section>
 </template>
+
+<style scoped>
+.blog-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 24px;
+  margin-bottom: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  border-bottom: 1px solid var(--c-border);
+}
+
+.blog-head__count {
+  margin: 0;
+  color: var(--c-text-soft);
+  font-weight: 600;
+}
+
+.blog-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(2.5rem, 2rem + 1.5vw, 3.5rem) clamp(20px, 2vw, 32px);
+}
+
+@media (min-width: 768px) {
+  .blog-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .blog-grid__featured {
+    grid-column: 1 / -1;
+    --blog-ratio: 21 / 9;
+  }
+}
+
+@media (min-width: 1280px) {
+  .blog-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+</style>

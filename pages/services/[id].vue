@@ -1,3 +1,5 @@
 <template>
-  <ServicesServiceDetails />
+  <div>
+    <ServicesServiceDetails />
+  </div>
 </template>

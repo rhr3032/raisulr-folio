@@ -1,5 +1,11 @@
+<script setup lang="ts">
+useHead({ title: "About" });
+</script>
+
 <template>
-    <AboutPageBanner/>
-    <AboutPageCounterCards/>
-    <AboutPageFeatureBanner/>
+  <div>
+    <AboutPageBanner />
+    <AboutPageCounterCards />
+    <AboutPageFeatureBanner />
+  </div>
 </template>

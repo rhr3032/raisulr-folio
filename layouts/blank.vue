@@ -1,7 +1,8 @@
-// ===============================|| Blank Layout ||=============================== //
+<!-- Blank layout: no header/footer (used by the 404 demo page) -->
 <template>
   <v-app>
-    <NuxtPage />
+    <main id="main">
+      <slot />
+    </main>
   </v-app>
 </template>
-

@@ -1,68 +1,84 @@
 <script setup lang="ts">
 import { onMounted, computed } from "vue";
 import { useProjectsGridStore } from "@/store/project";
-import { Icon } from "@iconify/vue";
 
 const store = useProjectsGridStore();
 
 onMounted(() => {
-  store.fetchPosts();
+  if (!store.projectGrid.length) store.fetchPosts();
 });
 
 const getPosts = computed(() => store.projectGrid);
-
-// Slug function to create URL-friendly links
-const slugify = (title?: string) => {
-  if (!title) return "";
-  return title
-    .toLowerCase()
-    .replace(/ /g, "-")
-    .replace(/[^\w-]+/g, "");
-};
 </script>
 
 <template>
-  <div class="bg-darkgray">
-  <SharedSectionSpacer />  
-  <div class="container-lg">
-    <v-row>
-      <v-col cols="12" lg="6" v-for="projects in getPosts" :key="projects.id">
-        <div>
-          <NuxtLink
-            :to="`/projects/${slugify(projects.project_title)}`"
-            class="project-card"
-          >
-            <div class="image-wrapper">
-              <v-img
-                :src="projects.project_image"
-                alt="image"
-                class="project-image w-100"
-                cover
-                height="500"
+  <section class="bg-darkgray">
+    <SharedSectionSpacer />
+    <div class="container-lg">
+      <div class="projects-head">
+        <SharedSectionLabel number="01" title="Selected work" />
+        <p v-if="getPosts.length" class="projects-head__count">
+          {{ String(getPosts.length).padStart(2, "0") }} projects
+        </p>
+      </div>
 
-              />
-              <div class="image-overlay">
-                <v-avatar size="60" class="icon bg-primary">
-                  <Icon icon="material-symbols:arrow-outward" height="25" />
-                </v-avatar>
-              </div>
-            </div>
-          </NuxtLink>
-          <h3 class="text-h3 text-dark py-5">
-            {{ projects.project_title }}
-          </h3>
-          <div class="d-flex ga-3">
-            <v-chip variant="outlined" class="text-subtitle-2 text-dark">{{
-              projects.tag1
-            }}</v-chip>
-            <v-chip variant="outlined" class="text-subtitle-2 text-dark">{{
-              projects.tag2
-            }}</v-chip>
-          </div>
-        </div>
-      </v-col>
-    </v-row>
-  </div>
-  <SharedSectionSpacer />
-  </div>
+      <div class="projects-grid">
+        <ProjectsProjectCard
+          v-for="(project, index) in getPosts"
+          :key="project.id"
+          v-reveal="(index % 2) * 120"
+          :project="project"
+          :index="index"
+          heading-level="h2"
+          class="projects-grid__item"
+        />
+      </div>
+    </div>
+    <SharedSectionSpacer />
+  </section>
 </template>
+
+<style scoped>
+.projects-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 24px;
+  margin-bottom: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  border-bottom: 1px solid var(--c-border);
+}
+
+.projects-head__count {
+  margin: 0;
+  color: var(--c-text-soft);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(2.5rem, 2rem + 2vw, 4rem) clamp(20px, 2.4vw, 40px);
+}
+
+@media (min-width: 768px) {
+  .projects-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Staggered second column for an editorial rhythm */
+  .projects-grid__item:nth-child(even) {
+    transform: translateY(clamp(48px, 8vw, 140px));
+  }
+
+  .projects-grid {
+    padding-bottom: clamp(48px, 8vw, 140px);
+  }
+
+  .projects-grid__item {
+    --card-ratio: 5 / 4;
+  }
+}
+</style>

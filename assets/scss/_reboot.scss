@@ -1,94 +1,280 @@
+// =====================================================================
+// Design tokens
+// All colours are derived from the existing Vuetify theme palette
+// (theme/LightTheme.ts, theme/DarkTheme.ts). No new brand colours.
+// =====================================================================
+:root {
+  // Surfaces & ink
+  --c-page: rgb(var(--v-theme-white));
+  --c-text: rgb(var(--v-theme-dark));
+  --c-text-soft: rgba(var(--v-theme-dark), 0.72);
+  --c-text-faint: rgba(var(--v-theme-dark), 0.68);
+  --c-border: rgba(var(--v-theme-dark), 0.1);
+  --c-border-strong: rgba(var(--v-theme-dark), 0.2);
+  --c-card: rgb(var(--v-theme-white));
+  --c-card-alt: rgb(var(--v-theme-surface));
+  --c-focus: rgb(var(--v-theme-secondary));
+  --c-overlay: rgba(var(--v-theme-secondary), 0.92);
+
+  // Shape
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: clamp(16px, 0.9rem + 0.6vw, 24px);
+  --radius-pill: 999px;
+
+  // Elevation (kept deliberately soft)
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-md: 0 18px 40px -20px rgba(16, 24, 40, 0.22);
+
+  // Spacing rhythm
+  --gutter: clamp(1rem, 0.45rem + 2.6vw, 3.5rem);
+  --section-space: clamp(4.5rem, 3rem + 6vw, 9rem);
+  --stack-lg: clamp(2.5rem, 1.75rem + 3vw, 4.5rem);
+  --header-h: 76px;
+
+  // Motion
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur-fast: 0.2s;
+  --dur: 0.35s;
+}
+
+html.dark {
+  --c-page: rgb(var(--v-theme-surface));
+  --c-card: rgb(var(--v-theme-darkgray));
+  --c-card-alt: rgb(var(--v-theme-accent));
+  --c-border: rgba(var(--v-theme-dark), 0.12);
+  --c-border-strong: rgba(var(--v-theme-dark), 0.22);
+  --c-text-soft: rgba(var(--v-theme-dark), 0.76);
+  --c-text-faint: rgba(var(--v-theme-dark), 0.66);
+  --c-focus: rgb(var(--v-theme-primary));
+  --shadow-md: 0 22px 44px -22px rgba(0, 0, 0, 0.6);
+}
+
+// Contextual ink for coloured surfaces – keeps text readable no matter
+// which theme is active.
+.on-ink,
+.bg-secondary {
+  --c-page: rgb(var(--v-theme-secondary));
+  --c-text: #ffffff;
+  --c-text-soft: rgba(255, 255, 255, 0.74);
+  --c-text-faint: rgba(255, 255, 255, 0.64);
+  --c-border: rgba(255, 255, 255, 0.12);
+  --c-border-strong: rgba(255, 255, 255, 0.24);
+  --c-card: rgba(255, 255, 255, 0.04);
+  --c-focus: rgb(var(--v-theme-primary));
+  color: var(--c-text);
+}
+
+.on-lime,
+.bg-primary {
+  --c-page: rgb(var(--v-theme-primary));
+  --c-text: rgb(var(--v-theme-secondary));
+  --c-text-soft: rgba(var(--v-theme-secondary), 0.76);
+  --c-text-faint: rgba(var(--v-theme-secondary), 0.68);
+  --c-border: rgba(var(--v-theme-secondary), 0.14);
+  --c-border-strong: rgba(var(--v-theme-secondary), 0.26);
+  --c-focus: rgb(var(--v-theme-secondary));
+  color: var(--c-text);
+}
+
+// =====================================================================
+// Base
+// =====================================================================
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-h) + 16px);
+  background: var(--c-page);
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
+
+body {
+  font-family: 'Manrope', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--c-text);
+  background: var(--c-page);
+  overflow-x: clip;
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+::selection {
+  background: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-secondary));
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 3px;
+}
+
+a {
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+// Smooth colour cross-fade while switching themes (class added briefly by useAppTheme)
+html.theme-switching,
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition: background-color 0.35s ease, border-color 0.35s ease, color 0.2s ease, fill 0.35s ease !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// =====================================================================
+// Utilities (kept from the original project + new helpers)
+// =====================================================================
 .lh-0 {
   line-height: 0;
 }
+
 .lh-in {
   line-height: inherit;
-}
-
-.text-deconraion-none {
-  text-decoration: none;
-}
-
-.hover-opacity-100 {
-  &:hover {
-    opacity: 1 !important;
-  }
-
 }
 
 .w-64 {
   width: 64px;
 }
 
-.hover-primary-title {
-  &:hover {
-    .title {
-      color: rgb(var(--v-theme-primary));
-    }
-  }
-}
-
 .obj-cover {
   object-fit: cover;
 }
-.hover-primary-link{
-  &:hover{
-     color: rgb(var(--v-theme-primary)) !important;
-  }
-}
 
-.list-style-none{
+.list-style-none {
   list-style: none;
   margin-left: 0;
+  padding-left: 0;
 }
 
-.hover-opacity-1{
-  &:hover{
+.hover-opacity-100,
+.hover-opacity-1 {
+  &:hover {
     opacity: 1 !important;
   }
 }
 
-/* Dark mode: Force text visibility */
-.v-application.dark {
-  /* Remove opacity constraints */
-  [class*="opacity-"] {
-    opacity: 1 !important;
-  }
+.hover-primary-link {
+  transition: color var(--dur-fast) ease;
 
-  /* Force all text elements to white */
-  h1, h2, h3, h4, h5, h6 {
-    color: rgb(var(--v-theme-white)) !important;
-  }
-
-  p {
-    color: rgb(var(--v-theme-white)) !important;
-  }
-
-  span {
-    color: rgb(var(--v-theme-white)) !important;
-  }
-
-  label {
-    color: rgba(var(--v-theme-white), 0.7) !important;
-  }
-
-  /* Text utility classes */
-  .text-h1, .text-h2, .text-h3, .text-h4, .text-h5, .text-h6,
-  .text-subtitle-1, .text-subtitle-2,
-  .text-body-1, .text-body-2,
-  .text-60 {
-    color: rgb(var(--v-theme-white)) !important;
-  }
-
-  /* Explicit color classes */
-  .text-dark,
-  .text-white,
-  .text-secondary {
-    color: rgb(var(--v-theme-white)) !important;
+  &:hover {
+    color: rgb(var(--v-theme-primary)) !important;
   }
 }
 
+.text-ink {
+  color: var(--c-text) !important;
+}
 
+.text-soft {
+  color: var(--c-text-soft) !important;
+}
+
+.text-faint {
+  color: var(--c-text-faint) !important;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.measure {
+  max-width: 62ch;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-text-soft);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 2000;
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  background: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-secondary));
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(-160%);
+  transition: transform var(--dur) var(--ease-out);
+
+  &:focus-visible {
+    transform: none;
+    outline-color: rgb(var(--v-theme-secondary));
+  }
+}
+
+// Theme-specific visibility helpers for decorative assets
+.only-dark {
+  display: none !important;
+}
+
+html.dark {
+  .only-light {
+    display: none !important;
+  }
+
+  .only-dark {
+    display: revert !important;
+  }
+}
+
+main:focus {
+  outline: none;
+}

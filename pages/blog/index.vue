@@ -1,4 +1,10 @@
+<script setup lang="ts">
+useHead({ title: "Blog" });
+</script>
+
 <template>
-    <BlogsBlogGridBlogBanner/>
-    <BlogsBlogGrid/>
+  <div>
+    <BlogsBlogGridBlogBanner />
+    <BlogsBlogGrid />
+  </div>
 </template>

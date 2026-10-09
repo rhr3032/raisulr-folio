@@ -1,178 +1,257 @@
 <script setup lang="ts">
-import { watch } from "vue";
-import ToggleMenu from "./ToggleMenu.vue";
-import { useTheme } from "vuetify";
+import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue";
 import { Icon } from "@iconify/vue";
+import DarkLogo from "/images/logos/DarkLogo.svg";
+import WhiteLogo from "/images/logos/WhiteLogo.svg";
+import MobileMenu from "./MobileMenu.vue";
 
-const LIGHT = "LIGHT_THEME";
-const DARK = "DARK_THEME";
+const route = useRoute();
+const { isDark, toggleTheme } = useAppTheme();
 
-const theme = useTheme();
+const scrolled = ref(false);
+const menuOpen = ref(false);
 
-const toggleTheme = () => {
-  theme.global.name.value =
-    theme.global.name.value === LIGHT ? DARK : LIGHT;
+const onScroll = () => {
+  scrolled.value = window.scrollY > 24;
 };
 
-const menuItems = [
-  { title: "Home", url: "/" },
-  { title: "About", url: "/about" },
-  { title: "Works", url: "/projects" },
-  { title: "Services", url: "/services" },
-  { title: "Blog", url: "/blog" },
-  { title: "Contact", url: "/contact" },
-];
+onMounted(() => {
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive: true });
+});
 
-// ✅ Sync dark class with Vuetify theme
+onBeforeUnmount(() => window.removeEventListener("scroll", onScroll));
+
 watch(
-  () => theme.global.name.value,
-  (newTheme) => {
-    const html = document.documentElement;
-    if (newTheme === DARK) {
-      html.classList.add("dark");
-    } else {
-      html.classList.remove("dark");
-    }
-  },
-  { immediate: true }
+  () => route.fullPath,
+  () => {
+    menuOpen.value = false;
+  }
 );
+
+// Over hero imagery the header is transparent with white ink; once the page
+// scrolls it becomes a solid, theme-aware bar.
+const logo = computed(() => (scrolled.value && !isDark.value ? DarkLogo : WhiteLogo));
 </script>
 
 <template>
-  <header class="header-simple">
-    <!-- Desktop Navigation Bar -->
-    <nav class="nav-bar desktop-only">
-      <div class="nav-container">
-        <ul class="nav-items">
-          <li v-for="item in menuItems" :key="item.url">
-            <NuxtLink :to="item.url" class="nav-link">
+  <header class="site-header" :class="{ 'is-solid': scrolled }">
+    <div class="container-lg site-header__inner">
+      <NuxtLink to="/" class="site-header__brand" aria-label="Raisul R. — Home">
+        <img :src="logo" alt="" width="121" height="36" />
+      </NuxtLink>
+
+      <nav class="site-nav" aria-label="Primary">
+        <ul>
+          <li v-for="item in primaryNav" :key="item.url">
+            <NuxtLink
+              :to="item.url"
+              class="site-nav__link"
+              :class="{ 'is-active': isActiveRoute(route.path, item.url) }"
+              :aria-current="isActiveRoute(route.path, item.url) ? 'page' : undefined"
+            >
               {{ item.title }}
             </NuxtLink>
           </li>
         </ul>
+      </nav>
 
-        <!-- Theme Toggle -->
-        <button class="theme-btn" @click="toggleTheme" aria-label="Toggle theme">
-          <Icon
-            :icon="
-              theme.global.name.value === LIGHT
-                ? 'solar:sun-bold'
-                : 'solar:moon-stars-bold'
-            "
-            width="18"
-            height="18"
-          />
+      <div class="site-header__actions">
+        <button
+          type="button"
+          class="header-icon-btn"
+          :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+          :title="isDark ? 'Light mode' : 'Dark mode'"
+          @click="toggleTheme"
+        >
+          <Icon :icon="isDark ? 'solar:moon-stars-bold' : 'solar:sun-bold'" width="20" height="20" />
+        </button>
+
+        <SharedAppButton
+          to="/contact"
+          label="Let's talk"
+          size="sm"
+          class="site-header__cta"
+        />
+
+        <button
+          type="button"
+          class="header-icon-btn site-header__menu-btn"
+          aria-label="Open menu"
+          aria-haspopup="dialog"
+          :aria-expanded="menuOpen"
+          @click="menuOpen = true"
+        >
+          <Icon icon="tabler:menu-2" width="22" height="22" />
         </button>
       </div>
-    </nav>
-
-    <!-- Mobile Toggle Menu -->
-    <div class="mobile-only">
-      <ToggleMenu />
     </div>
+
+    <MobileMenu v-model="menuOpen" />
   </header>
 </template>
 
 <style scoped>
-.header-simple {
+.site-header {
+  --hdr-ink: #ffffff;
+  --hdr-ink-soft: rgba(255, 255, 255, 0.78);
+  --hdr-line: rgba(255, 255, 255, 0.22);
+  --hdr-pill: rgba(255, 255, 255, 0.08);
+  --hdr-hover: rgba(255, 255, 255, 0.12);
+  --c-focus: rgb(var(--v-theme-primary));
+
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 999;
-  padding: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-}
-
-.nav-bar {
-  width: fit-content;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
-  border-radius: 50px;
-  padding: 12px 24px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.5);
-  transition: all 0.3s ease;
-}
-
-.nav-container {
+  inset: 0 0 auto;
+  z-index: 1000;
+  height: var(--header-h);
   display: flex;
   align-items: center;
-  gap: 2rem;
+  color: var(--hdr-ink);
+  border-bottom: 1px solid transparent;
+  transition: background-color var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out);
 }
 
-.nav-items {
-  list-style: none;
-  display: flex;
-  gap: 2rem;
-  margin: 0;
-  padding: 0;
+/* Subtle top shade keeps white nav legible over bright photos */
+.site-header::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 -40px;
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(31, 42, 46, 0.35), rgba(31, 42, 46, 0));
+  pointer-events: none;
+  transition: opacity var(--dur) var(--ease-out);
 }
 
-.nav-link {
-  color: rgba(0, 0, 0, 0.85);
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  transition: color 0.3s ease;
-  white-space: nowrap;
-  text-transform: capitalize;
+.site-header.is-solid {
+  --hdr-ink: var(--c-text);
+  --hdr-ink-soft: var(--c-text-soft);
+  --hdr-line: var(--c-border-strong);
+  --hdr-pill: transparent;
+  --hdr-hover: rgba(var(--v-theme-dark), 0.06);
+  --c-focus: var(--c-text);
+
+  background: rgba(var(--v-theme-white), 0.86);
+  border-bottom-color: var(--c-border);
+  backdrop-filter: saturate(160%) blur(16px);
+  -webkit-backdrop-filter: saturate(160%) blur(16px);
 }
 
-.nav-link:hover {
-  color: rgb(var(--v-theme-primary));
-  text-shadow: 0 0 10px rgba(197, 255, 0, 0.3);
+:global(html.dark .site-header.is-solid) {
+  --c-focus: rgb(var(--v-theme-primary));
+  background: rgba(var(--v-theme-surface), 0.86);
 }
 
-.nav-link.router-link-active {
-  color: rgb(var(--v-theme-primary));
+.site-header.is-solid::before {
+  opacity: 0;
 }
 
-.theme-btn {
+.site-header__inner {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 36px;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.site-header__brand {
+  display: inline-flex;
+  flex: none;
+  border-radius: var(--radius-xs);
+}
+
+.site-header__brand img {
+  display: block;
   height: 36px;
-  border-radius: 50%;
-  background: rgba(197, 255, 0, 0.8);
-  border: none;
-  color: #000;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  padding: 0;
+  width: auto;
 }
 
-.theme-btn:hover {
-  background: rgba(197, 255, 0, 0.2);
-  border-color: rgba(197, 255, 0, 0.4);
-  transform: rotate(20deg);
-}
-
-.desktop-only {
+/* Desktop navigation */
+.site-nav ul {
   display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  padding: 5px;
+  list-style: none;
+  border: 1px solid var(--hdr-line);
+  border-radius: var(--radius-pill);
+  background: var(--hdr-pill);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: border-color var(--dur) var(--ease-out), background-color var(--dur) var(--ease-out);
 }
 
-.mobile-only {
+.site-nav__link {
+  display: inline-flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 16px;
+  border-radius: var(--radius-pill);
+  color: var(--hdr-ink-soft);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--dur-fast) ease, background-color var(--dur-fast) ease;
+}
+
+.site-nav__link:hover {
+  color: var(--hdr-ink);
+  background: var(--hdr-hover);
+}
+
+.site-nav__link.is-active {
+  color: rgb(var(--v-theme-secondary));
+  background: rgb(var(--v-theme-primary));
+}
+
+.site-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-icon-btn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--hdr-line);
+  background: var(--hdr-pill);
+  color: var(--hdr-ink);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) ease, border-color var(--dur-fast) ease, color var(--dur-fast) ease;
+}
+
+.header-icon-btn:hover {
+  background: rgb(var(--v-theme-primary));
+  border-color: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-secondary));
+}
+
+.site-header__menu-btn {
   display: none;
 }
 
-@media (max-width: 768px) {
-  .header-simple {
-    padding: 15px;
-    justify-content: flex-end;
-  }
-
-  .desktop-only {
+@media (max-width: 1023.98px) {
+  .site-nav {
     display: none;
   }
 
-  .mobile-only {
-    display: inline-flex;
+  .site-header__menu-btn {
+    display: grid;
+  }
+}
+
+@media (max-width: 599.98px) {
+  .site-header__cta {
+    display: none;
+  }
+
+  .site-header__brand img {
+    height: 32px;
   }
 }
 </style>

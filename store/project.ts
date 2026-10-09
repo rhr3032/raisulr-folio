@@ -27,8 +27,7 @@ export const useProjectsGridStore = defineStore('project',{
                 const data = await axios.get('/api/data/projects/grid');
                 this.projectGrid = data.data;
             } catch (error) {
-                alert(error);
-                console.log(error);
+                console.error(error);
             }
         },
         async fetchPost(title: string) {
@@ -36,8 +35,7 @@ export const useProjectsGridStore = defineStore('project',{
                 const response = await axios.post('/api/data/projects/post', { title });
                 this.selectedProjects = response.data.post;
             } catch (error) {
-                alert(error);
-                console.log(error);
+                console.error(error);
             }
         }
     }

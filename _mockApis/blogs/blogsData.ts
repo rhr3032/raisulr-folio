@@ -4,14 +4,14 @@ import { sub } from "date-fns";
 import mock from "../mockAdapter";
 
 // Main Images
-import blog1 from "/images/blog/blog1.png";
-import blog2 from "/images/blog/blog2.png";
-import blog3 from "/images/blog/blog3.png";
+import blog1 from "/images/blog/blog1.webp";
+import blog2 from "/images/blog/blog2.webp";
+import blog3 from "/images/blog/blog3.webp";
 import blog4 from "/images/projects/project3.webp";
 
 // Detail images
-import blog11 from "/images/blog/blog11.png";
-import blog21 from "/images/blog/blog21.png";
+import blog11 from "/images/blog/blog11.webp";
+import blog21 from "/images/blog/blog21.webp";
 import blog31 from "/images/projects/details/pd-43.webp";
 import blog41 from "/images/projects/details/pd-61.webp";
 

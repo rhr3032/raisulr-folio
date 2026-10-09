@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import { Icon } from "@iconify/vue";
 import img1 from "/images/team/team-img-1.png";
 import img2 from "/images/team/team-img-2.png";
@@ -31,68 +30,105 @@ const items = [
 </script>
 
 <template>
-  <div class="meet-team bg-darkgray">
-  <SharedSectionSpacer />
-  <div class="container-lg">
-    <v-row>
-      <v-col cols="12" lg="4">
-        <SharedLeftSideDarkHeading number="06" title="The team" />
-      </v-col>
-      <v-col cols="12" lg="8">
-        <div class="d-flex flex-column ga-11">
-          <SharedCommonHeading
-            class="mw-670"
-            title="Meet our team"
-            subtitle="Our team is committed to redefining digital experiences through innovative web solutions while fostering a diverse and collaborative environment."
-          />
-        </div>
-      </v-col>
-    </v-row>
+  <section class="meet-team bg-darkgray">
+    <SharedSectionSpacer />
+    <div class="container-lg">
+      <SharedSectionIntro
+        number="06"
+        label="The team"
+        title="Meet our team"
+        subtitle="Our team is committed to redefining digital experiences through innovative web solutions while fostering a diverse and collaborative environment."
+      />
 
-    <v-row class="mt-lg-16 mt-8">
-      <v-col cols="12" lg="3" md="6" v-for="item in items" :key="item.name">
-        <div class="our-team lh-0 position-relative">
-          <img
-            :src="item.image"
-            alt="team"
-            class="w-100 obj-cover"
-            height="470"
-          />
-          <div
-            class="team-social d-flex ga-3 position-absolute "
-          >
-            <v-avatar size="44" class="social-icon cursor-pointer">
-              <Icon
-                icon="garden:twitter-stroke-12"
-                height="18"
-                class="text-secondary"
-              />
-            </v-avatar>
-            <v-avatar size="44" class="social-icon cursor-pointer">
-              <Icon
-                icon="simple-icons:behance"
-                height="18"
-                class="text-secondary"
-              />
-            </v-avatar>
-            <v-avatar size="44" class="social-icon cursor-pointer">
-              <Icon
-                icon="entypo-social:linkedin"
-                height="18"
-                class="text-secondary"
-              />
-            </v-avatar>
+      <div class="team-grid mt-10 mt-lg-16">
+        <article v-for="(item, index) in items" :key="item.name" v-reveal="(index % 4) * 80" class="team-member">
+          <div class="media team-member__media">
+            <img :src="item.image" :alt="item.name" loading="lazy" decoding="async" />
+            <div class="team-member__social">
+              <a href="#" class="team-member__icon" :aria-label="`${item.name} on Twitter`">
+                <Icon icon="garden:twitter-stroke-12" height="18" />
+              </a>
+              <a href="#" class="team-member__icon" :aria-label="`${item.name} on Behance`">
+                <Icon icon="simple-icons:behance" height="18" />
+              </a>
+              <a href="#" class="team-member__icon" :aria-label="`${item.name} on LinkedIn`">
+                <Icon icon="entypo-social:linkedin" height="18" />
+              </a>
+            </div>
           </div>
-          <div class="teambox"></div>
-        </div>
-        <div class="mt-5">
-          <h4 class="text-h4">{{ item.name }}</h4>
-          <p class="text-dark" :class="$vuetify.theme.global.name.value === 'light' ? 'opacity-70' : 'opacity-100'">{{ item.role }}</p>
-        </div>
-      </v-col>
-    </v-row>
-  </div>
-
-  <SharedSectionSpacer />
-  </div>
+          <h3 class="team-member__name">{{ item.name }}</h3>
+          <p class="team-member__role">{{ item.role }}</p>
+        </article>
+      </div>
+    </div>
+    <SharedSectionSpacer />
+  </section>
 </template>
+
+<style scoped>
+.team-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px 24px;
+}
+
+@media (min-width: 600px) {
+  .team-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1280px) {
+  .team-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.team-member__media {
+  aspect-ratio: 4 / 5;
+}
+
+.team-member__social {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity var(--dur) var(--ease-out), transform var(--dur) var(--ease-out);
+}
+
+.team-member:hover .team-member__social,
+.team-member:focus-within .team-member__social {
+  opacity: 1;
+  transform: none;
+}
+
+.team-member__icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ffffff;
+  color: rgb(var(--v-theme-secondary));
+  transition: background-color var(--dur-fast) ease;
+}
+
+.team-member__icon:hover {
+  background: rgb(var(--v-theme-primary));
+}
+
+.team-member__name {
+  margin: 18px 0 4px;
+  color: var(--c-text);
+  font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+  font-weight: 700;
+}
+
+.team-member__role {
+  margin: 0;
+  color: var(--c-text-soft);
+}
+</style>

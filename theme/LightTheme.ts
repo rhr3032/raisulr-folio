@@ -15,6 +15,9 @@ const LIGHT_THEME: ThemeTypes = {
         lightgray:'#F4F8FA',
         dark:'#1f2a2e',
         surface:'#F4F8FA',
+        // Light sections that use `bg-darkgray` have always rendered on white;
+        // declaring it keeps that exact colour explicit.
+        darkgray:'#ffffff',
         accent:'#ffffff'
     }
 };

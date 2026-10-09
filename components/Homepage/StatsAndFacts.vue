@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { Icon } from "@iconify/vue";
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import BgImage from "/images/background/bg-astrisk-icon.png";
 import BgImageWhite from "/images/background/bg-astrisk-icon-white.png";
 
@@ -10,7 +9,7 @@ interface CounterItem {
   caption: string;
 }
 
-const items = ref<CounterItem[]>([
+const items: CounterItem[] = [
   {
     value: 4000,
     suffix: "K",
@@ -26,44 +25,20 @@ const items = ref<CounterItem[]>([
     suffix: "K",
     caption: "Support through messages and live consultations",
   },
-]);
+];
 
-// Animated values
-const animatedValues = ref<number[]>(items.value.map(() => 0));
-
-onMounted(() => {
-  items.value.forEach((item, index) => {
-    animateCounter(item.value, index);
-  });
-});
-
-function animateCounter(target: number, index: number) {
-  const duration = 2000;
-  const frameDuration = 1000 / 60;
-  const totalFrames = Math.round(duration / frameDuration);
-  let frame = 0;
-
-  const counterInterval = setInterval(() => {
-    frame++;
-    const progress = frame / totalFrames;
-    const current = Math.floor(target * progress);
-    animatedValues.value[index] = current;
-
-    if (frame === totalFrames) {
-      animatedValues.value[index] = target;
-      clearInterval(counterInterval);
-    }
-  }, frameDuration);
-}
+const statsEl = ref<HTMLElement | null>(null);
+const animatedValues = useCountUp(
+  statsEl,
+  items.map((item) => item.value)
+);
 
 function formatNumber(value: number, suffix: string) {
   if (suffix === "K") {
     return `${Math.floor(value / 1000)}K`;
   } else if (suffix === "M") {
     const millions = value / 1_000_000;
-    return Number.isInteger(millions)
-      ? `${millions}M`
-      : `${millions.toFixed(1)}M`;
+    return Number.isInteger(millions) ? `${millions}M` : `${millions.toFixed(1)}M`;
   } else {
     return `${value}`;
   }
@@ -71,51 +46,103 @@ function formatNumber(value: number, suffix: string) {
 </script>
 
 <template>
-  <div class="position-relative bg-surface overflow-hidden">
+  <section id="stats" class="stats position-relative bg-surface overflow-hidden">
     <SharedSectionSpacer />
-    <div class="container-lg">
-      <v-row>
-        <v-col cols="12" lg="4">
-          <SharedLeftSideDarkHeading number="01" title="Stats & facts" />
-        </v-col>
-        <v-col cols="12" lg="8">
-          <div class="d-flex flex-column ga-11">
-            <SharedCommonHeading
-              class="mw-md-575"
-              title="Over 6+ years of expertise as a Product Designer and Developer."
-              subtitle="I design and build clean, user-focused digital products by turning ideas into intuitive, high-performing experiences through thoughtful UX and modern development."
-            />
+    <div class="container-lg position-relative">
+      <SharedSectionIntro
+        number="01"
+        label="Stats & facts"
+        title="Over 6+ years of expertise as a Product Designer and Developer."
+        subtitle="I design and build clean, user-focused digital products by turning ideas into intuitive, high-performing experiences through thoughtful UX and modern development."
+      />
 
-            <div class="d-flex flex-sm-row flex-column ga-8">
-              <div
-                class="d-flex flex-column ga-3 flex-grow-1 border-t "
-                v-for="(item, index) in items"
-                :key="index"
-              >
-                <h3 class="text-60 text-dark pt-6">
-                  {{ formatNumber(animatedValues[index] ?? 0, item.suffix) }}+
-                </h3>
-                <p
-                  class="text-subtitle-2 text-dark opacity-70 font-weight-regular"
-                >
-                  {{ item.caption }}
-                </p>
-              </div>
+      <v-row class="mt-6 mt-lg-12">
+        <v-col cols="12" lg="8" offset-lg="4">
+          <dl ref="statsEl" class="stats__grid">
+            <div v-for="(item, index) in items" :key="index" v-reveal="index * 90" class="stats__item">
+              <dt class="stats__caption">{{ item.caption }}</dt>
+              <dd class="stats__value">
+                {{ formatNumber(animatedValues[index] ?? 0, item.suffix) }}<span>+</span>
+              </dd>
             </div>
+          </dl>
 
-            <v-btn class="interactive-button" to="/about" size="lg" flat>
-              <span class="label">Who am I</span>
-              <v-avatar size="45" class="icon bg-white">
-                <Icon icon="material-symbols:arrow-outward" height="20" />
-              </v-avatar>
-            </v-btn>
+          <div class="mt-10 mt-lg-14">
+            <SharedAppButton to="/about" label="Who am I" />
           </div>
         </v-col>
       </v-row>
     </div>
-    <img :src="BgImage" alt="icon" class="bg-icon icon-rotate d-md-block d-none" />
-    <img :src="BgImageWhite" alt="icon" class="bg-icon icon-rotate d-md-block d-none" />
 
+    <div class="stats__decor" aria-hidden="true">
+      <img :src="BgImage" alt="" class="icon-rotate only-light" />
+      <img :src="BgImageWhite" alt="" class="icon-rotate only-dark" />
+    </div>
     <SharedSectionSpacer />
-  </div>
+  </section>
 </template>
+
+<style scoped>
+.stats__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0 32px;
+  margin: 0;
+}
+
+@media (min-width: 600px) {
+  .stats__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.stats__item {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 24px 0;
+  border-top: 1px solid var(--c-border-strong);
+}
+
+.stats__value {
+  margin: 0;
+  color: var(--c-text);
+  font-size: clamp(2.75rem, 1.9rem + 3.4vw, 4.5rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+}
+
+.stats__value span {
+  color: var(--c-text-faint);
+}
+
+.stats__caption {
+  max-width: 26ch;
+  color: var(--c-text-soft);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.stats__decor {
+  position: absolute;
+  top: 38%;
+  left: -90px;
+  width: clamp(220px, 22vw, 360px);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.stats__decor img {
+  width: 100%;
+  height: auto;
+}
+
+@media (max-width: 1279.98px) {
+  .stats__decor {
+    display: none;
+  }
+}
+</style>

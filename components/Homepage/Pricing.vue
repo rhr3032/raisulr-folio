@@ -10,8 +10,7 @@ const plans = [
   {
     title: "Launch",
     price: 699,
-    description:
-      "Ideal for startups and small businesses taking their first steps online.",
+    description: "Ideal for startups and small businesses taking their first steps online.",
     features: [
       "Competitive research & insights",
       "Wireframing and prototyping",
@@ -24,8 +23,7 @@ const plans = [
     title: "Scale",
     strikeprice: 2199,
     price: 1699,
-    description:
-      "Perfect for growing brands needing more customization and flexibility.",
+    description: "Perfect for growing brands needing more customization and flexibility.",
     features: [
       "Everything in the Launch Plan",
       "Custom design for up to 10 pages",
@@ -37,8 +35,7 @@ const plans = [
   {
     title: "Elevate",
     price: 3499,
-    description:
-      "Best suited for established businesses wanting a fully tailored experience.",
+    description: "Best suited for established businesses wanting a fully tailored experience.",
     features: [
       "Everything in the Scale Plan",
       "E-commerce functionality (if needed)",
@@ -49,184 +46,250 @@ const plans = [
   },
 ];
 
-const logos = [
-  {
-    logoimg: logo1,
-  },
-  {
-    logoimg: logo2,
-  },
-  {
-    logoimg: logo3,
-  },
-  {
-    logoimg: logo4,
-  },
-  {
-    logoimg: logo5,
-  },
-  {
-    logoimg: logo1,
-  },
-  {
-    logoimg: logo2,
-  },
-  {
-    logoimg: logo3,
-  },
-  {
-    logoimg: logo4,
-  },
-  {
-    logoimg: logo5,
-  },
-  {
-    logoimg: logo1,
-  },
-  {
-    logoimg: logo4,
-  },
-  {
-    logoimg: logo5,
-  },
-  {
-    logoimg: logo1,
-  },
-  {
-    logoimg: logo2,
-  },
-  {
-    logoimg: logo3,
-  },
-  {
-    logoimg: logo4,
-  },
-];
+const logos = [logo1, logo2, logo3, logo4, logo5, logo1, logo2, logo3, logo4, logo5];
+
+const formatPrice = (value: number) => value.toLocaleString("en-US");
 </script>
+
 <template>
-  <div class="pricing bg-surface">
+  <section class="pricing bg-darkgray">
     <SharedSectionSpacer />
-    <div class="container-lg overflow-hidden">
-      <v-row>
-        <!-- LEFT SIDE IMAGE -->
-        <v-col cols="12" lg="4" class="position-relative">
-          <SharedLeftSideDarkHeading number="07" title="Pricing" />
-        </v-col>
+    <div class="container-lg">
+      <SharedSectionIntro
+        number="06"
+        label="Pricing"
+        title="Affordable pricing"
+        subtitle="A glimpse into our creativity—exploring innovative designs, successful collaborations, and transformative digital experiences."
+      />
 
-        <!-- RIGHT SIDE TEXT LIST -->
-        <v-col cols="12" lg="8">
-          <div class="d-flex flex-column ga-11">
-            <SharedCommonHeading
-              class="mw-670"
-              title="Affordable pricing"
-              subtitle="A glimpse into our creativity—exploring innovative designs, successful collaborations, and transformative digital experiences."
-            />
+      <div class="pricing__grid mt-10 mt-lg-16">
+        <article
+          v-for="(plan, index) in plans"
+          :key="plan.title"
+          v-reveal="index * 100"
+          class="plan"
+          :class="{ 'plan--featured on-ink': plan.mostPopular }"
+          :aria-label="`${plan.title} plan`"
+        >
+          <header class="plan__header">
+            <div class="d-flex align-center justify-space-between ga-3 flex-wrap">
+              <h3 class="plan__title">{{ plan.title }}</h3>
+              <span v-if="plan.mostPopular" class="tag tag--lime">
+                <Icon icon="solar:fire-linear" width="16" height="16" aria-hidden="true" />
+                Most Popular
+              </span>
+            </div>
+
+            <p class="plan__price">
+              <span v-if="plan.strikeprice" class="plan__strike">
+                <span class="visually-hidden">Was </span>${{ formatPrice(plan.strikeprice) }}
+              </span>
+              <span class="plan__amount">
+                <span class="visually-hidden" v-if="plan.strikeprice">now </span>${{ formatPrice(plan.price) }}
+              </span>
+              <span class="plan__period">/month</span>
+            </p>
+            <p class="plan__desc">{{ plan.description }}</p>
+          </header>
+
+          <div class="plan__body">
+            <p class="plan__included">What’s Included:</p>
+            <ul class="plan__features">
+              <li v-for="(feature, i) in plan.features" :key="i">
+                <span class="plan__check" aria-hidden="true">
+                  <Icon icon="tabler:check" width="16" height="16" />
+                </span>
+                {{ feature }}
+              </li>
+            </ul>
           </div>
-        </v-col>
-      </v-row>
-      <div class="pricing mt-md-16 mt-10">
-        <v-row >
-          <v-col
-            v-for="(plan, index) in plans"
-            :key="plan.title"
-            cols="12"
-            lg="4"
-            md="6"
-            class="d-flex"
-          >
-            <v-card class="pa-lg-12 pa-6 flex-grow-1 bg-accent" elevation="0">
-              <div class="d-flex justify-space-between align-center mb-4">
-                <div class="d-flex flex-column ga-5">
-                  <div class="d-flex ga-3">
-                    <p class="text-subtitle-1 font-weight-medium">
-                      {{ plan.title }}
-                    </p>
-                    <v-chip
-                      v-if="plan.mostPopular"
-                      color="secondary"
-                      text-color="white"
-                      variant="flat"
-                    >
-                      <Icon icon="solar:fire-linear" class="me-2" height="18" />
-                      Most Popular
-                    </v-chip>
-                  </div>
 
-                  <div class="d-flex align-center ga-2">
-                    <div class="d-flex ga-4">
-                      <h3
-                        class="text-h3 font-weight-bold text-dark opacity-40 text-decoration-line-through"
-                        v-if="plan.strikeprice"
-                      >
-                        ${{ plan.strikeprice }}
-                      </h3>
-                      <h3 class="text-h3 font-weight-bold">
-                        ${{ plan.price }}
-                      </h3>
-                    </div>
-                    <small class="text-dark opacity-70 text-subtitle-1"
-                      >/month</small
-                    >
-                  </div>
-                </div>
-              </div>
-
-              <p
-                class="text-subtitle-2 text-dark opacity-70 font-weight-regular mb-6"
-              >
-                {{ plan.description }}
-              </p>
-              <v-divider class="my-10 opacity-10"></v-divider>
-              <div class="mb-6">
-                <p class="text-subtitle-2 mb-2">What’s Included:</p>
-                <ul class="d-flex flex-column ga-4 mt-4">
-                  <li
-                    v-for="(feature, i) in plan.features"
-                    :key="i"
-                    class="px-0 d-flex ga-3 align-center"
-                  >
-                    <v-avatar size="32" color="primary">
-                      <Icon
-                        icon="tabler:check"
-                        height="18"
-                        class="text-secondary"
-                      />
-                    </v-avatar>
-                    <v-list-item-title class="text-body-2">{{
-                      feature
-                    }}</v-list-item-title>
-                  </li>
-                </ul>
-              </div>
-
-              <v-btn
-                class="interactive-button w-100 mt-4"
-                to="/about"
-                size="lg"
-                flat
-              >
-                <span class="label">Subscribe Now</span>
-                <v-avatar size="45" class="icon bg-white">
-                  <Icon icon="material-symbols:arrow-outward" height="20" />
-                </v-avatar>
-              </v-btn>
-            </v-card>
-          </v-col>
-        </v-row>
+          <SharedAppButton
+            to="/contact"
+            label="Subscribe Now"
+            :variant="plan.mostPopular ? 'primary' : 'outline'"
+            block
+            :aria-label="`Subscribe to the ${plan.title} plan`"
+          />
+        </article>
       </div>
-      <div class="mt-md-16 mt-10">
-        <p class="text-center text-subtitle-1">
-          More than 320 trusted partners & clients
-        </p>
-        <div class="marquee d-flex mt-10">
-          <div class="marquee-content d-flex align-center ga-10 justify-center">
-            <div class="marquee-tag" v-for="item in logos" :key="item.logoimg">
-              <img :src="item.logoimg" />
+
+      <div class="partners mt-16 mt-lg-20">
+        <p class="partners__title">More than 320 trusted partners &amp; clients</p>
+        <div class="marquee mt-8" aria-label="Partner logos" role="img">
+          <div class="marquee__track">
+            <div v-for="copy in 2" :key="copy" class="partners__set" :aria-hidden="copy === 2">
+              <div v-for="(logo, i) in logos" :key="`${copy}-${i}`" class="marquee-tag">
+                <img :src="logo" alt="" width="160" height="48" loading="lazy" />
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
     <SharedSectionSpacer />
-  </div>
+  </section>
 </template>
+
+<style scoped>
+.pricing__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .pricing__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  /* Avoid an orphaned third card on tablets */
+  .plan:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 1024px) {
+  .pricing__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    gap: clamp(16px, 1.6vw, 24px);
+  }
+}
+
+.plan {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: clamp(24px, 1.2rem + 1.4vw, 44px);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--c-border);
+  background: var(--c-card-alt);
+}
+
+.plan--featured {
+  background: rgb(var(--v-theme-secondary));
+  border-color: rgb(var(--v-theme-secondary));
+}
+
+:global(html.dark .plan--featured) {
+  border-color: rgba(var(--v-theme-primary), 0.6);
+}
+
+.plan__title {
+  margin: 0;
+  color: var(--c-text);
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.plan__price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin: 20px 0 0;
+}
+
+.plan__amount {
+  color: var(--c-text);
+  font-size: clamp(2.5rem, 1.9rem + 2vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+.plan__strike {
+  color: var(--c-text-faint);
+  font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.625rem);
+  font-weight: 600;
+  text-decoration: line-through;
+}
+
+.plan__period {
+  color: var(--c-text-soft);
+  font-weight: 500;
+}
+
+.plan__desc {
+  margin: 14px 0 0;
+  color: var(--c-text-soft);
+  line-height: 1.6;
+}
+
+.plan__body {
+  flex: 1;
+  padding-top: 28px;
+  border-top: 1px solid var(--c-border);
+}
+
+.plan__included {
+  margin: 0 0 16px;
+  color: var(--c-text);
+  font-weight: 700;
+}
+
+.plan__features {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plan__features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: var(--c-text);
+  line-height: 1.5;
+}
+
+.plan__check {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-secondary));
+}
+
+.partners__title {
+  margin: 0;
+  text-align: center;
+  color: var(--c-text-soft);
+  font-weight: 600;
+}
+
+.partners__set {
+  display: flex;
+  align-items: center;
+}
+
+.marquee-tag {
+  flex: none;
+  padding: 0 clamp(20px, 3vw, 44px);
+}
+
+.marquee-tag img {
+  display: block;
+  height: clamp(32px, 2.6vw, 44px);
+  width: auto;
+  opacity: 0.7;
+  transition: opacity var(--dur) var(--ease-out);
+}
+
+.marquee-tag:hover img {
+  opacity: 1;
+}
+
+:global(html.dark .marquee-tag img) {
+  filter: invert(1);
+}
+</style>

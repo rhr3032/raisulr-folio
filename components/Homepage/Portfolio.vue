@@ -1,27 +1,29 @@
+<script setup lang="ts">
+import { Icon } from "@iconify/vue";
+</script>
+
 <template>
-  <div class="position-relative bg-darkgray">
-    <!-- Section Spacer -->
+  <section class="position-relative bg-darkgray">
     <SharedSectionSpacer />
     <div class="container-lg">
-      <v-row>
-        <v-col cols="12" lg="4">
-          <SharedLeftSideDarkHeading number="02" title="Portfolio" />
-        </v-col>
-        <v-col cols="12" lg="8">
-          <div class="d-flex flex-column ga-96">
-            <SharedCommonHeading
-              class="mw-md-670"
-              title="Featured projects"
-              subtitle="A glimpse into my creativity—exploring innovative designs, successful collaborations, and transformative digital experiences."
-            />
-          </div>
-        </v-col>
-      </v-row>
+      <SharedSectionIntro
+        number="02"
+        label="Portfolio"
+        title="Featured projects"
+        subtitle="A glimpse into my creativity—exploring innovative designs, successful collaborations, and transformative digital experiences."
+      >
+        <div>
+          <NuxtLink to="/projects" class="link-arrow">
+            View all projects
+            <Icon icon="material-symbols:arrow-outward" width="20" height="20" aria-hidden="true" />
+          </NuxtLink>
+        </div>
+      </SharedSectionIntro>
+
+      <div class="mt-10 mt-lg-16">
+        <ProjectsProjectGrid />
+      </div>
     </div>
-    <div class="projects pt-md-95 pt-50">
-      <ProjectsProjectGrid />
-    </div>
-    <!-- Section Spacer -->
     <SharedSectionSpacer />
-  </div>
+  </section>
 </template>

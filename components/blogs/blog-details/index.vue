@@ -1,94 +1,133 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import { onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import { useblogGridStore } from "@/store/blogs";
-import AnimatedIcon from "/images/svgs/astrisk-icon.svg";
-const title = useRoute();
-const getTitle = title.path.split("/").pop();
+import type { BlogTypes } from "@/types/blog/BlogTypes";
 
-onMounted(() => {
-  store.fetchPost(`${getTitle}`);
-  store.fetchPosts();
-});
+const route = useRoute();
+const slug = String(route.params.id ?? route.path.split("/").pop());
 const store = useblogGridStore();
 
-const post = computed(() => {
-  return store.selectedblog;
+onMounted(async () => {
+  await Promise.all([store.fetchPost(slug), store.blogGrid.length ? null : store.fetchPosts()]);
+  if (!post.value?.blog_title) {
+    showError({ statusCode: 404, statusMessage: "Article not found" });
+  }
 });
+
+const post = computed<BlogTypes>(() => {
+  const selected = store.selectedblog as BlogTypes;
+  return slugify(selected?.blog_title) === slug ? selected : {};
+});
+
+const morePosts = computed(() => store.blogGrid.filter((b) => slugify(b.blog_title) !== slug).slice(0, 3));
+
+useHead(() => ({ title: post.value.blog_title || "Article" }));
 </script>
 
 <template>
-  <div class="common-banner position-relative">
-    <v-img :src="post.blog_image" cover height="650" class="w-100"></v-img>
-    <div class="banner-overlay"></div>
-    <div class="container-lg">
-      <div class="common-banner-content">
-        <div class="mw-575">
-          <!-- Top row: icon + paragraph -->
-          <div class="d-flex ga-6">
-            <img
-              :src="AnimatedIcon"
-              alt="icon"
-              height="44"
-              width="44"
-              class="icon-rotate"
-            />
-            <p class="text-white text-subtitle-1 mb-0 opacity-70">
-              In a world where standing still means falling behind, we knew it
-              was time for a bold transformation..
-            </p>
-          </div>
-        </div>
-        <!-- Bottom row: title + badge -->
-        <div
-          class="d-flex flex-md-row flex-column ga-5 align-md-end align-start mt-md-6 mt-3"
-        >
-          <h1 class="text-white text-60 font-weight-bold mb-0">
-            {{ post.blog_title }}
-          </h1>
-          <SharedBigBadge />
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- Blog Details -->
-  <div class="bg-darkgray">
+  <SharedPageHero
+    :image="post.blog_image"
+    :title="post.blog_title"
+    size="lg"
+    badge-label="Read"
+    :crumbs="[{ label: 'Blog', to: '/blog' }, { label: post.blog_title || '…' }]"
+  >
+    <template #intro>
+      In a world where standing still means falling behind, we knew it was time for a bold transformation..
+    </template>
+    <template #aside>
+      <span v-if="post.blog_date" class="tag tag--glass">
+        <time>{{ post.blog_date }}</time>
+      </span>
+    </template>
+  </SharedPageHero>
+
+  <article class="bg-darkgray">
     <SharedSectionSpacer />
     <div class="container-lg">
-      <v-row class="d-flex align-center">
-        <!-- LEFT SIDE IMAGE -->
+      <SharedAppButton to="/blog" label="All articles" icon="material-symbols:arrow-back" variant="outline" size="md" back />
+
+      <v-row class="mt-10 mt-lg-14">
         <v-col cols="12" lg="4">
-          <h2 class="text-60 text-dark">Scroll to read</h2>
+          <p class="eyebrow section-aside">Scroll to read</p>
         </v-col>
-        <v-col cols="12" lg="8"
-          ><p class="text-dark text-subtitle-1 opacity-70">
-            At nuysdev, we're always evolving, and our latest brand redesign is
-            a bold step forward. This transformation reflects our commitment to
-            innovation and growth, both in how we look and how we connect with
-            you.
+        <v-col cols="12" lg="8">
+          <p v-reveal class="article__lead">
+            At nuysdev, we're always evolving, and our latest brand redesign is a bold step forward. This
+            transformation reflects our commitment to innovation and growth, both in how we look and how we connect
+            with you.
           </p>
         </v-col>
-        <v-col cols="12" class="mt-lg-16 mt-8">
-          <div class="lh-0">
-            <v-img
-              :src="post.blog_inner_image"
-              alt="project inner image"
-              class="w-100"
-              cover
-              height="600"
-            ></v-img>
-          </div>
+      </v-row>
+
+      <div v-if="post.blog_inner_image" v-reveal class="media article__media mt-10 mt-lg-16">
+        <img :src="post.blog_inner_image" :alt="post.blog_title" loading="lazy" decoding="async" />
+      </div>
+
+      <v-row class="mt-10 mt-lg-16">
+        <v-col cols="12" lg="8" offset-lg="4">
+          <div v-reveal class="project-desciption prose" v-html="post.blog_description"></div>
         </v-col>
-        <v-col cols="12" lg="4"></v-col>
-        <v-col cols="12" lg="8"
-          ><div
-            class="project-desciption mt-lg-16 mt-8"
-            v-html="post.blog_description"
-          ></div
-        ></v-col>
       </v-row>
     </div>
     <SharedSectionSpacer />
-  </div>
+  </article>
+
+  <section v-if="morePosts.length" class="bg-surface">
+    <SharedSectionSpacer />
+    <div class="container-lg">
+      <div class="more-head">
+        <h2 class="text-h2 text-ink mb-0">More articles</h2>
+        <NuxtLink to="/blog" class="link-arrow">View all articles</NuxtLink>
+      </div>
+      <div class="more-grid">
+        <BlogsBlogCard v-for="(blog, index) in morePosts" :key="blog.id" v-reveal="index * 90" :blog="blog" />
+      </div>
+    </div>
+    <SharedSectionSpacer />
+  </section>
 </template>
+
+<style scoped>
+.article__lead {
+  max-width: 40ch;
+  margin: 0;
+  color: var(--c-text);
+  font-size: clamp(1.375rem, 1.1rem + 1.2vw, 2.125rem);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+}
+
+.article__media {
+  aspect-ratio: 16 / 9;
+}
+
+@media (max-width: 599.98px) {
+  .article__media {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+.more-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+}
+
+.more-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(2.5rem, 2rem + 1.5vw, 3rem) clamp(20px, 2vw, 32px);
+}
+
+@media (min-width: 768px) {
+  .more-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+</style>

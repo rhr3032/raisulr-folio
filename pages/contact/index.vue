@@ -1,4 +1,10 @@
+<script setup lang="ts">
+useHead({ title: "Contact" });
+</script>
+
 <template>
-    <ContactPageContactBanner/>
-    <HomepageGetinTouch/>
+  <div>
+    <ContactPageContactBanner />
+    <HomepageGetinTouch number="01" />
+  </div>
 </template>

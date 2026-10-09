@@ -1,8 +1,8 @@
+// Order matters: Vuetify settings → Vuetify base → project layers (so project rules win ties).
 @use 'variables';
-@use 'pages';
-@use 'header';
-@use 'reboot';
 @use 'vuetify/styles.scss' as *;
+@use 'reboot';
 @use 'components';
+@use 'header';
+@use 'pages';
 @use 'dark';
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
